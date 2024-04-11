@@ -41,15 +41,15 @@ async function createUser(name, email, password) {
  */
 async function updateUser(id, name, email) {
   return User.updateOne(
-    {
-      _id: id,
-    },
-    {
-      $set: {
-        name,
-        email,
+      {
+        _id: id,
       },
-    }
+      {
+        $set: {
+          name,
+          email,
+        },
+      }
   );
 }
 
@@ -62,10 +62,21 @@ async function deleteUser(id) {
   return User.deleteOne({ _id: id });
 }
 
+/**
+ * Check if the email already exists
+ * @param {string} email - Email
+ * @returns {Promise}
+ */
+async function checkDuplicateEmail(email) {
+  const existingUser = await User.findOne({ email: email });
+  return !!existingUser;
+}
+
 module.exports = {
   getUsers,
   getUser,
   createUser,
   updateUser,
   deleteUser,
+  checkDuplicateEmail,
 };

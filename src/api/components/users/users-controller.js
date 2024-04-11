@@ -51,11 +51,20 @@ async function createUser(request, response, next) {
     const email = request.body.email;
     const password = request.body.password;
 
+    const isEmailDuplcate = await usersService.checkDuplicateEmail(email);
+
+    if (isEmailDuplcate) {
+      throw errorResponder(
+          errorTypes.EMAIL_ALREADY_TAKEN,
+          'Failed to create user, email already exists'
+      );
+    }
+
     const success = await usersService.createUser(name, email, password);
     if (!success) {
       throw errorResponder(
-        errorTypes.UNPROCESSABLE_ENTITY,
-        'Failed to create user'
+          errorTypes.UNPROCESSABLE_ENTITY,
+          'Failed to create user'
       );
     }
 
@@ -78,11 +87,20 @@ async function updateUser(request, response, next) {
     const name = request.body.name;
     const email = request.body.email;
 
+    const isEmailDuplcate = usersService.checkDuplicateEmail(email);
+
+    if (isEmailDuplcate) {
+      throw errorResponder(
+          errorTypes.EMAIL_ALREADY_TAKEN,
+          'Failed to update user, email already exists'
+      );
+    }
+
     const success = await usersService.updateUser(id, name, email);
     if (!success) {
       throw errorResponder(
-        errorTypes.UNPROCESSABLE_ENTITY,
-        'Failed to update user'
+          errorTypes.UNPROCESSABLE_ENTITY,
+          'Failed to update user'
       );
     }
 
@@ -106,8 +124,8 @@ async function deleteUser(request, response, next) {
     const success = await usersService.deleteUser(id);
     if (!success) {
       throw errorResponder(
-        errorTypes.UNPROCESSABLE_ENTITY,
-        'Failed to delete user'
+          errorTypes.UNPROCESSABLE_ENTITY,
+          'Failed to delete user'
       );
     }
 
