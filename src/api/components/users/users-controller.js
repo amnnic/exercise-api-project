@@ -1,5 +1,6 @@
 const usersService = require('./users-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
+const {passwordMatched} = require("../../../utils/password");
 
 /**
  * Handle get list of users request
@@ -95,7 +96,7 @@ async function updateUser(request, response, next) {
     const name = request.body.name;
     const email = request.body.email;
 
-    const isEmailDuplcate = usersService.checkDuplicateEmail(email);
+    const isEmailDuplcate = await usersService.checkDuplicateEmail(email);
 
     if (isEmailDuplcate) {
       throw errorResponder(
@@ -142,6 +143,14 @@ async function deleteUser(request, response, next) {
     return next(error);
   }
 }
+
+/**
+ * Handle update user request
+ * @param {object} request - Express request object
+ * @param {object} response - Express response object
+ * @param {object} next - Express route middlewares
+ * @returns {object} Response object or pass an error to the next route
+ */
 
 module.exports = {
   getUsers,
