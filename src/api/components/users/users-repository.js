@@ -72,6 +72,26 @@ async function checkDuplicateEmail(email) {
   return !!existingUser;
 }
 
+/**
+ * Update existing user
+ * @param {string} id - User ID
+ * @param {string} newPassword - New Password
+ * @returns {Promise}
+ */
+async function changePassword(id, newPassword) {
+  return User.updateOne(
+      {
+        _id: id,
+      },
+      {
+        $set: {
+          password: newPassword
+        },
+      }
+  );
+}
+
+
 module.exports = {
   getUsers,
   getUser,
@@ -79,4 +99,5 @@ module.exports = {
   updateUser,
   deleteUser,
   checkDuplicateEmail,
+  changePassword,
 };

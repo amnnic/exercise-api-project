@@ -1,5 +1,5 @@
 const usersRepository = require('./users-repository');
-const { hashPassword } = require('../../../utils/password');
+const { hashPassword, passwordMatched} = require('../../../utils/password');
 
 /**
  * Get list of users
@@ -117,6 +117,37 @@ async function checkDuplicateEmail(email) {
   return !!existingUser;
 }
 
+/**
+ * Change password user
+ * @param {string} id - User ID
+ * @param {string} oldPassword - Old Password
+ * @param {string} newPassword - New Password
+ * @returns {boolean}
+ */
+async function changePassword(id, oldPassword, newPassword) {
+  const user = await usersRepository.getUser(id);
+
+  // User not found
+  if (!user) {
+    return null;
+  }
+
+  const passwordChecked = await passwordMatched(oldPassword, user.password);
+
+  // Old password not same with new password
+  if(!passwordChecked){
+    return null;
+  }
+
+  try {
+    await usersRepository.changePassword(id, newPassword);
+  } catch (err) {
+    return null;
+  }
+
+  return true;
+}
+
 module.exports = {
   getUsers,
   getUser,
@@ -124,4 +155,5 @@ module.exports = {
   updateUser,
   deleteUser,
   checkDuplicateEmail,
+  changePassword,
 };

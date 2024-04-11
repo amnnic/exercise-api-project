@@ -1,6 +1,5 @@
 const usersService = require('./users-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
-const {passwordMatched} = require("../../../utils/password");
 
 /**
  * Handle get list of users request
@@ -151,6 +150,34 @@ async function deleteUser(request, response, next) {
  * @param {object} next - Express route middlewares
  * @returns {object} Response object or pass an error to the next route
  */
+async function changePasswordUser(request, response, next) {
+  try {
+    const id = request.params.id;
+    const oldPassword = request.body.old_password;
+    const newPassword = request.body.new_password;
+    const newPasswordConfirm = request.body.new_password_confirm;
+
+    if (newPassword !== newPasswordConfirm) {
+      throw errorResponder(
+          errorTypes.INVALID_PASSWORD,
+          'Failed to change password user, new password and confirm new password is not same'
+      );
+    }
+
+    const success = await usersService.changePassword(id, oldPassword, newPassword);
+
+    if  (!success) {
+      throw errorResponder(
+          errorTypes.UNPROCESSABLE_ENTITY,
+          'Failed to change password user'
+      );
+    }
+
+    return response.status(200).json({ id });
+  } catch (error) {
+    return next(error);
+  }
+}
 
 module.exports = {
   getUsers,
@@ -158,4 +185,5 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  changePasswordUser,
 };
